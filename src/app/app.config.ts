@@ -1,15 +1,16 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 
 import { routes } from './app.routes';
-import { provideFirebaseApp } from '@angular/fire/app';
-import { AngularFireModule, FIREBASE_OPTIONS } from '@angular/fire/compat';
-import { initializeApp } from 'firebase/app';
+import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { environment } from 'src/environments/environment.development';
+import { provideToastr } from 'ngx-toastr';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAnimations(),
+    provideToastr(),
     provideRouter(routes),
     { provide: FIREBASE_OPTIONS, useValue: environment.firebaseConfig },
   ],

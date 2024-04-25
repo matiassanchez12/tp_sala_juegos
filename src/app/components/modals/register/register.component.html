@@ -1,5 +1,4 @@
 <div
-  *ngIf="isOpenModal()"
   id="default-modal"
   tabindex="-1"
   class="flex overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
@@ -41,6 +40,10 @@
       <!-- Modal body -->
       <div class="p-4 md:p-5 space-y-4">
         <form [formGroup]="formRegister" (ngSubmit)="onSubmit()">
+          <div class="mb-4" *ngIf="errorEmailUsed()">
+            <label class="ms-2 text-sm font-medium text-red-900 dark:text-red-400">El email ya está en uso</label>
+          </div>
+          
           <div class="grid gap-6 mb-6 md:grid-cols-1">
             <div>
               <label
@@ -152,6 +155,8 @@
             Registrarme
           </button>
 
+         
+          
           <div class="flex items-start mb-6 mt-4">
             <label
               for="remember"

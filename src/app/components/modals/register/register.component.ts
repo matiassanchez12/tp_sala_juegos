@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ModalService } from 'src/app/services/modal.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormGroup, FormControl, Validators, AbstractControl, FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -22,6 +23,7 @@ export class RegisterComponent {
   public userExist: boolean | undefined;
   
   isOpenModal = signal(false);
+  errorEmailUsed = signal(false);
 
   modalService = inject(ModalService);
   authService = inject(AuthService);
@@ -41,7 +43,7 @@ export class RegisterComponent {
     );
   }
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, public toastrService: ToastrService) {
     this.modalService.watch().subscribe((data) => {
       const isOpen = data.state === 'open' && data.type === 'register';
       this.isOpenModal.set(isOpen);
@@ -53,25 +55,23 @@ export class RegisterComponent {
       this.isLoading = true;
       const { email, password, name } = this.formRegister.value;
 
+      this.modalService.open('loader');
+
       this.authService
         .signUp(email, password, name)
         .then(() => {
-          console.log(123)
-          alert('creado')
-          // this.toastr.success('Usuario creado con exito!');
-          // this.handleCloseModal()
+          this.toastrService.success('Usuario creado con exito!', undefined, {positionClass: 'toast-top-center'});
+          
+          this.authService.signIn(email, password).then(() => {
+            this.handleCloseModal();
+          })
         })
         .catch((error: any) => {
-          let messageError = error;
-          if (error.code === 'auth/email-already-in-use') {
-            messageError = 'El email ya esta en uso';
-          }
-          console.log(error)
-
-          // this.toastr.error(messageError);
+          this.errorEmailUsed.set(true);
+          this.toastrService.error(error.message);
         })
         .finally(() => {
-          this.isLoading = false;
+          this.modalService.close('loader');
         });
     }
   }

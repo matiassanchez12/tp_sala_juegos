@@ -1,1 +1,11 @@
-{}
+{
+    "hosting": {
+      "site": "tp-sala-juego",
+      "public": "dist/tp-sala-juegos",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    }
+  }

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { Observable, switchMap, of } from 'rxjs';
+import { IUser } from '../interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +13,13 @@ export class AuthService {
     private firestore: AngularFirestore
   ) {}
 
-  signUp(email: string, password: string, name: string) {
+  async signUp(email: string, password: string, name: string) {
+    const emailIsUsed = await this.checkEmailInUse(email);
+
+    if (emailIsUsed) {
+      throw new Error('El correo ya esta en uso');
+    }
+
     return this.afAuth
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential: firebase.default.auth.UserCredential) => {
@@ -37,7 +45,33 @@ export class AuthService {
     return this.afAuth.signOut();
   }
 
-  getCurrentUser() {
-    return this.afAuth.authState;
+  getCurrentUser(): Observable<any> {
+    return this.afAuth.authState.pipe(
+      switchMap(user => {
+        if (user) {
+          const { uid, email } = user;
+
+          return this.firestore.collection<IUser>('users').doc(uid).valueChanges().pipe(
+            switchMap(userData => {
+              // Retornar un objeto que contenga los datos del usuario y su email
+              return of({ ...userData, email });
+            })
+          );
+        } else {
+          return of(null);
+        }
+      })
+    );
+  }
+
+  checkEmailInUse(email: string): Promise<boolean> {
+    return this.afAuth.fetchSignInMethodsForEmail(email)
+      .then(providers => {
+        return providers.length > 0;
+      })
+      .catch(error => {
+        console.log('Error al verificar el correo electrónico:', error);
+        return false;
+      });
   }
 }
