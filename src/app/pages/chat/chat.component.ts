@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
 import { ChatService } from 'src/app/services/chat.service';
@@ -17,6 +17,8 @@ export class ChatComponent {
   private authService = inject(AuthService);
   private chatService = inject(ChatService);
 
+  @ViewChild('chatContainer') chatContainer!: ElementRef;
+
   ngOnInit(): void {
     this.authService.getCurrentUser().subscribe((user) => {
       if (user) {
@@ -32,6 +34,10 @@ export class ChatComponent {
   public loadMessages() {
     this.chatService.getAllMessages().subscribe((messages) => {
       this.messages.set(messages);
+      
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 200);
     })
   }
 
@@ -45,5 +51,14 @@ export class ChatComponent {
     this.chatService.createMessage(commentText, this.userLoggedIn()!.id!, this.userLoggedIn()!.id!);
 
     form.reset();
+  }
+
+  private scrollToBottom() {
+    const container = this.chatContainer.nativeElement;
+    
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: 'smooth',
+    });
   }
 }

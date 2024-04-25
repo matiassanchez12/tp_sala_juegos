@@ -63,42 +63,52 @@
     </div>
     <div class="flex flex-col flex-auto h-full p-6">
       <div
-        class="flex flex-col flex-auto flex-shrink-0 rounded-2xl bg-gray-100 dark:bg-slate-800 h-full p-4"
+        class="flex flex-col flex-auto flex-shrink-0 rounded-2xl overflow-y-auto chatScreen bg-gray-100 dark:bg-slate-800 h-full p-4"
       >
-        <div class="flex flex-col h-full overflow-x-auto mb-4">
+        <div #chatContainer
+        autoScrollDown class="flex flex-col h-full overflow-x-auto mb-4">
           <div class="flex flex-col h-full">
-            <div class="grid grid-cols-12 gap-y-2">
+            <div class="flex flex-col gap-y-6 px-4">
               <div
-                class="col-start-1 col-end-8 p-3 rounded-lg"
+               
+                class="items-start rounded-lg"
                 *ngFor="let message of messages()"
                 [ngClass]="{
-                  'col-start-6 col-end-13 p-3 rounded-lg':
+                  'items-end rounded-lg':
                     message.sender_id === this.userLoggedIn()!.id
                 }"
               >
-                <div class="flex flex-row items-center"
+                <div class="flex flex-row items-center gap-2"
                 [ngClass]="{
                   'items-center justify-start flex-row-reverse':
                     message.sender_id === this.userLoggedIn()!.id
                 }"
                 >
                   <div
-                    class="flex items-center justify-center h-10 w-10 rounded-full bg-indigo-500 dark:text-white flex-shrink-0"
+                    class="flex items-center text-lg justify-center h-10 w-10 rounded-full bg-indigo-500 text-white flex-shrink-0"
+                    [ngClass]="{
+                      'bg-orange-500 text-lg':
+                        message.sender_id === this.userLoggedIn()!.id
+                    }"
                   >
-                    {{ message.sender_id }}
+                    {{ message.sender_id[0] }}
                   </div>
                   <div
                     class="relative ml-3 text-sm bg-white dark:bg-slate-600 dark:text-white py-2 px-4 shadow rounded-xl"
+                    [ngClass]="{
+                      'mr-3':
+                        message.sender_id === this.userLoggedIn()!.id
+                    }"
                   >
                     <div>{{ message.content }}</div>
                     <div
                       [ngClass]="{
-                        'block':
+                        'flex':
                           message.sender_id === this.userLoggedIn()!.id
                       }"
                       class="none absolute text-xs bottom-0 right-0 -mb-5 mr-2 text-gray-500"
                     >
-                      Seen
+                      {{ message.sender_id === this.userLoggedIn()!.id ? 'Seen' : 'Received' }}
                     </div>
                   </div>
                 </div>
