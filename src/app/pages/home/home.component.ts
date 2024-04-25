@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
+import { ModalService } from 'src/app/services/modal.service';
 
 @Component({
   selector: 'app-home',
@@ -13,6 +14,7 @@ export class HomeComponent {
   activeTab = signal('ahorcado');
   userLoggedIn = signal<{name: string, id: string, email: string} | null>(null);
 
+  modalService = inject(ModalService);
   authService = inject(AuthService);
 
   onTabClick = (tab: string) => {
@@ -27,5 +29,9 @@ export class HomeComponent {
         this.userLoggedIn.set(null);
       }
     })
+  }
+
+  handleOpenModal() {
+    this.modalService.open('login');
   }
 }
