@@ -54,12 +54,22 @@ export class LoginComponent {
     });
   }
 
-  async onSubmit() {
+  async onSubmit(user?: string) {
     this.formLogin.markAllAsTouched();
 
     if (!this.formLogin.invalid) {
       this.isLoading.set(true);
-      const { email, password } = this.formLogin.value;
+
+      let email,
+        password = '';
+
+      email = this.formLogin.value.email;
+      password = this.formLogin.value.password;
+
+      if (user) {
+        email = 'matias.sanchez.121@gmail.com';
+        password = '123123';
+      }
 
       this.modalService.open('loader');
 
@@ -70,7 +80,6 @@ export class LoginComponent {
             positionClass: 'toast-top-center',
           });
           this.handleCloseModal();
-          this.modalService.close('loader');
         })
         .catch((error: any) => {
           this.invalidEmailOrPassword.set(true);
@@ -78,6 +87,7 @@ export class LoginComponent {
         })
         .finally(() => {
           this.isLoading.set(false);
+          this.modalService.close('loader');
         });
     }
   }

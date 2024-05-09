@@ -1,0 +1,112 @@
+<div class="flex gap-8 flex-col text-black dark:text-white">
+  <div >
+    <button routerLink="/games">Back <-</button>
+  </div>
+  
+  <div class="flex justify-center">
+    <h1 class="text-3xl font-bold text-green-500">Snake Game</h1>
+  </div>
+
+  <div class="flex gap-2 items-center justify-center">
+    <p class="font-semibold">Usa las flechas para moverte:</p>
+    <div class="flex gap-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="text-[#00abfb] icon icon-tabler icon-tabler-arrow-big-down-filled"
+        width="44"
+        height="44"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="#00abfb"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M10 2l-.15 .005a2 2 0 0 0 -1.85 1.995v6.999l-2.586 .001a2 2 0 0 0 -1.414 3.414l6.586 6.586a2 2 0 0 0 2.828 0l6.586 -6.586a2 2 0 0 0 .434 -2.18l-.068 -.145a2 2 0 0 0 -1.78 -1.089l-2.586 -.001v-6.999a2 2 0 0 0 -2 -2h-4z"
+          stroke-width="0"
+          fill="currentColor"
+        />
+      </svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="text-[#00abfb] icon icon-tabler icon-tabler-arrow-big-left-filled"
+        width="44"
+        height="44"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="#00abfb"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M9.586 4l-6.586 6.586a2 2 0 0 0 0 2.828l6.586 6.586a2 2 0 0 0 2.18 .434l.145 -.068a2 2 0 0 0 1.089 -1.78v-2.586h7a2 2 0 0 0 2 -2v-4l-.005 -.15a2 2 0 0 0 -1.995 -1.85l-7 -.001v-2.585a2 2 0 0 0 -3.414 -1.414z"
+          stroke-width="0"
+          fill="currentColor"
+        />
+      </svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="text-[#00abfb] icon icon-tabler icon-tabler-arrow-big-right-filled"
+        width="44"
+        height="44"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="#00abfb"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M12.089 3.634a2 2 0 0 0 -1.089 1.78l-.001 2.586h-6.999a2 2 0 0 0 -2 2v4l.005 .15a2 2 0 0 0 1.995 1.85l6.999 -.001l.001 2.587a2 2 0 0 0 3.414 1.414l6.586 -6.586a2 2 0 0 0 0 -2.828l-6.586 -6.586a2 2 0 0 0 -2.18 -.434l-.145 .068z"
+          stroke-width="0"
+          fill="currentColor"
+        />
+      </svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="text-[#00abfb] icon icon-tabler icon-tabler-arrow-big-up-filled"
+        width="44"
+        height="44"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="#00abfb"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path
+          d="M10.586 3l-6.586 6.586a2 2 0 0 0 -.434 2.18l.068 .145a2 2 0 0 0 1.78 1.089h2.586v7a2 2 0 0 0 2 2h4l.15 -.005a2 2 0 0 0 1.85 -1.995l-.001 -7h2.587a2 2 0 0 0 1.414 -3.414l-6.586 -6.586a2 2 0 0 0 -2.828 0z"
+          stroke-width="0"
+          fill="currentColor"
+        />
+      </svg>
+    </div>
+  </div>
+
+  <div class="flex gap-2 flex-col text-center font-semibold">
+    <p>Puntaje más alto: 0</p>
+    <p>Puntaje actual: 0</p>
+  </div>
+
+  <div class="flex flex-col items-center justify-center">
+    <button
+      type="button"
+      class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+      (click)="startGame()"
+    >
+      {{ this.isFirstGame ? 'Empezar' : 'Reiniciar' }}
+    </button>
+
+    <div
+      class="border border-teal-600 dark:border-teal-400 w-[602px] rounded-md"
+    >
+      <canvas #gameCanvas width="600" height="400"></canvas>
+    </div>
+  </div>
+</div>

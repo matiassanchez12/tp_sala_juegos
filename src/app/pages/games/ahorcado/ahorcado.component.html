@@ -1,0 +1,52 @@
+<div class="flex gap-8 flex-col text-black dark:text-white">
+  <div>
+    <button routerLink="/games">Back <-</button>
+  </div>
+
+  <div class="flex justify-center">
+    <h1 class="text-3xl font-bold text-green-500">Ahorcado</h1>
+  </div>
+
+  <div class="flex flex-col gap-2 items-center justify-center">
+    <p class="font-semibold">Usá el teclado para adivinar la palabra:</p>
+
+    <div class="flex flex-wrap justify-center max-w-[32rem] gap-2">
+      <button
+        class="w-10 h-10 bg-teal-600 rounded-lg text-white font-bold"
+        *ngFor="let letter of letters"
+      >
+        {{ letter }}
+      </button>
+    </div>
+  </div>
+
+  <div class="flex gap-2 flex-col text-center font-semibold">
+    <p>Puntaje más alto: 0</p>
+    <p>Puntaje actual: 0</p>
+  </div>
+
+  <div class="flex flex-col items-center justify-center">
+    <div>imagen ahorcado</div>
+    <div class="flex items-center justify-center w-[400px] h-[200px] gap-2">
+      <div class="flex items-center flex-col gap-2">
+        <input
+          class="w-10 h-8 bg-transparent border-emerald-400 border rounded-md text-center"
+          maxlength="1"
+          type="text"
+          readonly
+        />
+        <div class="bg-gray-400 w-12 h-0.5"></div>
+      </div>
+
+      <div class="flex items-center flex-col gap-2">
+        <input
+          class="w-10 h-8 bg-transparent border-emerald-400 border rounded-md text-center"
+          maxlength="1"
+          type="text"
+          readonly
+        />
+        <div class="bg-gray-400 w-12 h-0.5"></div>
+      </div>
+    </div>
+  </div>
+</div>

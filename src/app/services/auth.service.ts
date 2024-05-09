@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { Observable, switchMap, of } from 'rxjs';
 import { IUser } from '../interfaces';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +12,9 @@ import { IUser } from '../interfaces';
 export class AuthService {
   constructor(
     private afAuth: AngularFireAuth,
-    private firestore: AngularFirestore
+    private firestore: AngularFirestore,
+    private db: AngularFireDatabase,
+    private router: Router,
   ) {}
 
   async signUp(email: string, password: string, name: string) {
@@ -37,26 +41,53 @@ export class AuthService {
       });
   }
 
-  signIn(email: string, password: string) {
-    return this.afAuth.signInWithEmailAndPassword(email, password);
+  async signIn(email: string, password: string) {
+    const user = await this.afAuth.signInWithEmailAndPassword(email, password);
+
+    const id = this.firestore.createId();
+
+    await this.firestore
+      .collection('logs_login')
+      .doc(id)
+      .set({ user_id: user.user?.uid, date: new Date() });
+
+    await this.firestore
+      .collection('online')
+      .doc(user.user?.uid)
+      .set({ user_id: user.user?.uid, date: new Date(), online: true });
+
+    return user;
   }
 
-  signOut() {
+  async signOut() {
+    const user = await this.afAuth.currentUser;
+
+    await this.firestore
+    .collection('online')
+    .doc(user?.uid)
+    .set({ user_id: user?.uid, date: new Date(), online: false });
+
+    this.router.navigate(['/home']);
+
     return this.afAuth.signOut();
   }
 
   getCurrentUser(): Observable<any> {
     return this.afAuth.authState.pipe(
-      switchMap(user => {
+      switchMap((user) => {
         if (user) {
           const { uid, email } = user;
 
-          return this.firestore.collection<IUser>('users').doc(uid).valueChanges().pipe(
-            switchMap(userData => {
-              // Retornar un objeto que contenga los datos del usuario y su email
-              return of({ ...userData, email });
-            })
-          );
+          return this.firestore
+            .collection<IUser>('users')
+            .doc(uid)
+            .valueChanges()
+            .pipe(
+              switchMap((userData) => {
+                localStorage.setItem('user', String({ ...userData, email }));
+                return of({ ...userData, email });
+              })
+            );
         } else {
           return of(null);
         }
@@ -64,12 +95,19 @@ export class AuthService {
     );
   }
 
+  getCurrentUserFromLocalstorage(): IUser | null {
+    const user = localStorage.getItem('user');
+
+    return JSON.parse(user!) as IUser;
+  }
+
   checkEmailInUse(email: string): Promise<boolean> {
-    return this.afAuth.fetchSignInMethodsForEmail(email)
-      .then(providers => {
+    return this.afAuth
+      .fetchSignInMethodsForEmail(email)
+      .then((providers) => {
         return providers.length > 0;
       })
-      .catch(error => {
+      .catch((error) => {
         console.log('Error al verificar el correo electrónico:', error);
         return false;
       });
