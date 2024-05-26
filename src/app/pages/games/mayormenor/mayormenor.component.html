@@ -1,1 +1,117 @@
-<p>mayormenor works!</p>
+<div class="flex gap-8 flex-col text-black dark:text-white">
+  <div class="pt-4">
+    <button
+      (click)="handleBack()"
+      type="button"
+      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="icon icon-tabler icon-tabler-arrow-left"
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="#ffffff"
+        fill="none"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M5 12l14 0" />
+        <path d="M5 12l6 6" />
+        <path d="M5 12l6 -6" />
+      </svg>
+      Volver
+    </button>
+  </div>
+
+  <div class="flex justify-center">
+    <h1 class="text-3xl font-bold text-green-500">Mayor y menor</h1>
+  </div>
+
+  <div class="flex gap-2 items-center justify-center">
+    <p class="font-semibold">
+      De un mazo de 9 cartas, adiviná en cada turno, cual es la mayor y cual la
+      menor
+    </p>
+  </div>
+
+  <div class="flex gap-2 flex-col text-center text-lg font-semibold">
+    <p>Puntaje más alto: {{ bestScore() }}</p>
+    <p>Puntaje actual: {{ score() }}</p>
+  </div>
+
+  <div class="flex flex-col items-center justify-center gap-2">
+    <div
+      class="flex gap-4"
+      *ngIf="!showSecondCard() && 9 - currentIndex > 0"
+    >
+      <button
+        type="button"
+        class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+        (click)="handleClick('mayor')"
+      >
+        Es mayor
+      </button>
+      <button
+        type="button"
+        class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+        (click)="handleClick('menor')"
+      >
+        Es menor
+      </button>
+    </div>
+
+    <div class="flex gap-4" *ngIf="showSecondCard()">
+      <button
+        type="button"
+        class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+        (click)="showNextCards()"
+      >
+        Siguiente carta
+      </button>
+    </div>
+
+    <div>
+      <p>
+        {{currentCards!.length > 0 ? 'Quedan: ' + (9 - currentIndex) + ' cartas' :
+        "No hay más cartas"}}
+      </p>
+    </div>
+
+    <div class="w-[602px]">
+      <div class="w-full h-full flex gap-4">
+        <img
+          [src]="this.getImagePathOne()"
+          alt="carta mazo - 1"
+          class="w-[300px] h-[250px] object-contain"
+        />
+        <img
+          [src]="this.getImagePathTwo()"
+          alt="carta mazo - 2"
+          class="w-[300px] h-[250px] object-contain transition-all duration-200 ease-in-out"
+          [ngClass]="{
+            invisible: !showSecondCard(),
+            visible: showSecondCard()
+          }"
+        />
+      </div>
+    </div>
+
+    <div class="flex gap-4" *ngIf="showSecondCard()">
+      <p
+        class="font-semibold text-green-500"
+        [ngClass]="{ hidden: !isCorrectAnswer() }"
+      >
+        Adivinaste!
+      </p>
+      <p
+        class="font-semibold text-red-500"
+        [ngClass]="{ hidden: isCorrectAnswer() }"
+      >
+        Respuesta incorrecta
+      </p>
+    </div>
+  </div>
+</div>

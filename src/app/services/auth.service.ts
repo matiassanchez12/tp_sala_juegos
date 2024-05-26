@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { Observable, switchMap, of } from 'rxjs';
 import { IUser } from '../interfaces';
 import { Router } from '@angular/router';
@@ -10,11 +9,12 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
+  public userLoggedIn = signal<IUser | null>(null);
+
   constructor(
     private afAuth: AngularFireAuth,
     private firestore: AngularFirestore,
-    private db: AngularFireDatabase,
-    private router: Router,
+    private router: Router
   ) {}
 
   async signUp(email: string, password: string, name: string) {
@@ -63,9 +63,9 @@ export class AuthService {
     const user = await this.afAuth.currentUser;
 
     await this.firestore
-    .collection('online')
-    .doc(user?.uid)
-    .set({ user_id: user?.uid, date: new Date(), online: false });
+      .collection('online')
+      .doc(user?.uid)
+      .set({ user_id: user?.uid, date: new Date(), online: false });
 
     this.router.navigate(['/home']);
 
@@ -84,7 +84,10 @@ export class AuthService {
             .valueChanges()
             .pipe(
               switchMap((userData) => {
-                localStorage.setItem('user', String({ ...userData, email }));
+                if (userData) {
+                  this.userLoggedIn.set({ ...userData, email: email! });
+                }
+
                 return of({ ...userData, email });
               })
             );
@@ -93,12 +96,6 @@ export class AuthService {
         }
       })
     );
-  }
-
-  getCurrentUserFromLocalstorage(): IUser | null {
-    const user = localStorage.getItem('user');
-
-    return JSON.parse(user!) as IUser;
   }
 
   checkEmailInUse(email: string): Promise<boolean> {

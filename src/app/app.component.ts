@@ -23,7 +23,7 @@ import { LoaderComponent } from './components/modals/loader/loader.component';
     RouterOutlet,
     LoginComponent,
     RegisterComponent,
-    LoaderComponent
+    LoaderComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
@@ -34,13 +34,15 @@ export class AppComponent {
 
   title = 'tp-sala-juegos';
 
+  isLoading = signal(true);
   isOpenModalLogin = signal(false);
   isOpenModalRegister = signal(false);
   isOpenModalLoader = signal(false);
-  userLoggedIn = signal<{name: string} | null>(null);
+  userLoggedIn = signal<{ name: string } | null>(null);
 
   modalService = inject(ModalService);
   authService = inject(AuthService);
+  toastrService = inject(ToastrService);
 
   @HostBinding('class.dark') get mode() {
     return this.darkMode();
@@ -50,34 +52,37 @@ export class AppComponent {
     this.darkMode.set(!this.darkMode());
   }
 
-  constructor(public toastrService: ToastrService) {
+  ngOnInit() {
     this.setDarkMode();
-    
+
     this.modalService.watchLoader().subscribe((data) => {
       this.isOpenModalLoader.set(data);
-    })
+    });
 
     this.modalService.watch().subscribe((data) => {
       const isOpenLogin = data.state === 'open' && data.type === 'login';
       const isOpenRegister = data.state === 'open' && data.type === 'register';
-      
+
       this.isOpenModalLogin.set(isOpenLogin);
       this.isOpenModalRegister.set(isOpenRegister);
     });
 
     this.authService.getCurrentUser().subscribe((user) => {
       if (user) {
-        this.userLoggedIn.set({name: user.name});
+        this.userLoggedIn.set({ name: user.name });
       } else {
         this.userLoggedIn.set(null);
       }
-    })
+      this.isLoading.set(false);
+    });
   }
 
   handleLoggout() {
     this.authService.signOut().then(() => {
-      this.toastrService.success('Sesión cerrada con exito!', undefined, {positionClass: 'toast-top-center'});
-    })
+      this.toastrService.success('Sesión cerrada con exito!', undefined, {
+        positionClass: 'toast-top-center',
+      });
+    });
   }
 
   handleOpenModal() {

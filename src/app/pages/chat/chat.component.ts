@@ -21,7 +21,7 @@ import { timePipe } from 'src/app/pipes/time.pipe';
 })
 export class ChatComponent {
   chatUsers = signal<IUser[]>([]);
-  userLoggedIn = signal<{ name: string; id: string; email: string } | null>(
+  userLoggedIn = signal<IUser| null>(
     null
   );
   messages = signal<IChatMessage[]>([]);
@@ -33,17 +33,7 @@ export class ChatComponent {
   @ViewChild('chatContainer') chatContainer!: ElementRef;
 
   ngOnInit(): void {
-    this.authService.getCurrentUser().subscribe((user) => {
-      if (user) {
-        this.userLoggedIn.set({
-          name: user.name,
-          id: user.id,
-          email: user.email,
-        });
-      } else {
-        this.userLoggedIn.set(null);
-      }
-    });
+    this.userLoggedIn.set(this.authService.userLoggedIn());
 
     this.userService.getUsersOnline().subscribe((users) => {
       

@@ -4,10 +4,14 @@ import {
   OnInit,
   ViewChild,
   inject,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { UserService } from 'src/app/services/user.service';
+import { IUserScore } from 'src/app/interfaces';
+import { AuthService } from 'src/app/services/auth.service';
 
 enum Direction {
   Up,
@@ -40,19 +44,37 @@ export class SnakeComponent implements OnInit {
   gameInterval: any;
   isFirstGame: boolean = true;
 
+  bestScore = signal(0);
+  score = signal(0);
+
   toastrService = inject(ToastrService);
+  userService = inject(UserService);
+  authService = inject(AuthService);
+  router = inject(Router);
 
   ngOnInit() {
     this.context = (
       this.canvasRef.nativeElement as HTMLCanvasElement
     ).getContext('2d') as CanvasRenderingContext2D;
+
     window.addEventListener('keydown', (e) => this.handleKeyPress(e));
+
+    this.userService.getBestScoreByGame('snake').subscribe((score) => {
+      if (score.length > 0) {
+        this.bestScore.set((score[0] as IUserScore).score);
+      }
+    });
+  }
+
+
+  handleBack() {
+    this.router.navigate(['/games']);
   }
 
   startGame() {
     if (this.isFirstGame) {
       this.placeFood();
-      this.gameInterval = setInterval(() => this.gameLoop(), 100);
+      this.gameInterval = setInterval(() => this.gameLoop(), 150);
       this.isFirstGame = false;
       return;
     }
@@ -63,7 +85,7 @@ export class SnakeComponent implements OnInit {
     this.snake = [{ x: 10, y: 10 }];
     this.direction = Direction.Right;
     this.placeFood();
-    this.gameInterval = setInterval(() => this.gameLoop(), 100);
+    this.gameInterval = setInterval(() => this.gameLoop(), 150);
   }
 
   gameLoop() {
@@ -78,13 +100,22 @@ export class SnakeComponent implements OnInit {
     var img = new Image();
 
     img.src = '/assets/kiwi.png';
-
+    img.alt = 'kiwi';
+    
     this.context.drawImage(
       img,
       this.food.x * this.blockSize,
       this.food.y * this.blockSize,
-      22,
-      22
+      24,
+      24
+    );
+
+    this.context.fillStyle = 'red';
+    this.context.fillRect(
+      this.food.x * this.blockSize,
+      this.food.y * this.blockSize,
+      12,
+      12
     );
 
     // Draw snake
@@ -121,6 +152,7 @@ export class SnakeComponent implements OnInit {
 
     if (newHead.x === this.food.x && newHead.y === this.food.y) {
       this.placeFood();
+      this.score.update((prev) => prev + 1);
     } else {
       this.snake.pop();
     }
@@ -146,20 +178,32 @@ export class SnakeComponent implements OnInit {
     ) {
       clearInterval(this.gameInterval);
 
+      this.food.x = 0;
+      this.food.y = 0;
+
+      this.userService.saveUserScore(
+        this.authService.userLoggedIn()!,
+        this.score(),
+        'snake'
+      );
+      this.score.set(0);
+
       this.toastrService.warning('Game Over!', undefined, {
         positionClass: 'toast-center-center',
       });
-
-      this.food.x = 0;
-      this.food.y = 0;
     }
-    
+
     for (let i = 1; i < this.snake.length; i++) {
       if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
         clearInterval(this.gameInterval);
         this.food.x = 0;
         this.food.y = 0;
-
+        this.userService.saveUserScore(
+          this.authService.userLoggedIn()!,
+          this.score(),
+          'snake'
+        );
+        this.score.set(0);
         this.toastrService.warning('Game Over!', undefined, {
           positionClass: 'toast-center-center',
         });
